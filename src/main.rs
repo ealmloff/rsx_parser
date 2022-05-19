@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 
+use crate::interperter::build;
 use crate::lexer::Lexer;
+use dioxus::prelude::*;
 use lazy_static::lazy_static;
 use qp_trie::{wrapper::BString, Trie};
 
@@ -205,9 +207,51 @@ text_parse!(
 );
 
 fn main() {
+    dioxus::web::launch(app);
+}
+
+fn app(cx: Scope) -> Element {
+    let input = use_state(&cx, || {
+        let text =
+            r#"rsx!{div{background_color:"green",span{color: "red",font_size:"100px","Welcome"}}}"#;
+        let parser = rsx::RsxParser::new();
+        let lexer = Lexer::new(text);
+        let result = parser.parse(text, lexer);
+        format!("{:?}", result.unwrap())
+    });
+
     let parser = rsx::RsxParser::new();
-    let input = r#"rsx!{div{width: "100px",height: "*{x}px",span{color: "red","hello world"}}}"#;
     let lexer = Lexer::new(input);
-    let result = parser.parse(input, lexer);
-    println!("{:?}", result);
+    let result = parser.parse(input.get(), lexer);
+    let text = match &result {
+        Ok(e) => format!("{e:?}"),
+        Err(e) => {
+            format!("{e:?}")
+        }
+    };
+
+    let html = dioxus::ssr::render_lazy(LazyNodes::new(|factory| {
+        build(result.unwrap_or_default(), &factory)
+    }));
+
+    cx.render(rsx! {
+        textarea{
+            width: "100%",
+            height: "10em",
+            value:"{input}",
+            oninput: |evt|{
+                input.set(evt.data.value.to_string());
+            }
+        }
+        p{
+            white_space: "pre",
+            "{text}",
+        }
+        div{
+            "{html}"
+        }
+        div{
+            dangerous_inner_html: "{html}"
+        }
+    })
 }

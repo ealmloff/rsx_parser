@@ -30,21 +30,30 @@ impl<'a> Value<'a> {
 #[derive(Clone, PartialEq, Debug)]
 pub struct Values<'a>(pub Vec<Value<'a>>);
 
+impl Values<'_> {
+    pub fn to_string(&self) -> String {
+        let mut result = String::new();
+        for val in &self.0 {
+            match &val {
+                Value::Constant(s) => result += s,
+                Value::Variable(s) => result += format!("{{{}}}", s).as_str(),
+                Value::Error => result += "!error!",
+            }
+        }
+        result
+    }
+}
+
 impl fmt::Display for Values<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.write_str("\"")?;
-        for val in &self.0 {
-            match &val {
-                Value::Constant(s) => f.write_str(s)?,
-                Value::Variable(s) => f.write_fmt(format_args!("{{!{}!}}", s))?,
-                Value::Error => f.write_str("!error!")?,
-            }
-        }
+        f.write_str(self.to_string().as_str())?;
         f.write_str("\"")?;
         Ok(())
     }
 }
 
+#[derive(Default)]
 pub struct RsxCall<'a>(pub Vec<Node<'a>>);
 
 impl Debug for RsxCall<'_> {
