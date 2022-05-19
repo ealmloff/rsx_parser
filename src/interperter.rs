@@ -1,14 +1,14 @@
 use dioxus::core::{Attribute, NodeFactory, ScopeState, VNode};
 
 use crate::{
-    ast::{Node, RsxCall, Value},
+    ast::{Node, RsxCall},
     build_element::build_element,
     AttributeScope, ATTRIBUTES_MAP,
 };
 
 fn build<'a>(rsx: RsxCall<'a>, scope: &'a ScopeState) -> VNode<'a> {
     let factory = NodeFactory::new(scope);
-    let mut children_built = factory.bump().alloc(Vec::new());
+    let children_built = factory.bump().alloc(Vec::new());
     for child in rsx.0 {
         children_built.push(build_node(child, &factory));
     }

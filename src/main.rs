@@ -147,17 +147,17 @@ lazy_static! {
         for (dioxus_name, _) in attributes::svg::MAPPED_ATTRIBUTES {
             hs.insert(*dioxus_name);
         }
-        for (el, attrs) in elements::ELEMENTS_WITHOUT_NAMESPACE {
+        for (_el, attrs) in elements::ELEMENTS_WITHOUT_NAMESPACE {
             for dioxus_name in *attrs {
                 hs.insert(*dioxus_name);
             }
         }
-        for (el, _, attrs) in elements::ELEMENTS_WITH_NAMESPACE {
+        for (_el, _, attrs) in elements::ELEMENTS_WITH_NAMESPACE {
             for dioxus_name in *attrs {
                 hs.insert(*dioxus_name);
             }
         }
-        for (el, attrs) in elements::ELEMENTS_WITH_ATTRIBUTE_MAPPING {
+        for (_el, attrs) in elements::ELEMENTS_WITH_ATTRIBUTE_MAPPING {
             for (dioxus_name, _) in *attrs {
                 hs.insert(*dioxus_name);
             }
