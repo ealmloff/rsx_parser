@@ -31,7 +31,7 @@ pub struct Values<'a>(pub String, pub Vec<Value<'a>>, pub String);
 
 impl Values<'_> {
     pub fn to_string(&self) -> String {
-        let mut result = self.0.clone();
+        let mut result = String::new();
         for val in &self.1 {
             match &val {
                 Value::Constant(s) => result += s,
@@ -39,14 +39,16 @@ impl Values<'_> {
                 Value::Error => result += "!error!",
             }
         }
-        result += &self.2;
         result
     }
 }
 
 impl fmt::Display for Values<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.write_str(self.to_string().as_str())?;
+        let mut text = self.0.clone();
+        text += &self.to_string();
+        text += &self.2;
+        f.write_str(&text)?;
         Ok(())
     }
 }
