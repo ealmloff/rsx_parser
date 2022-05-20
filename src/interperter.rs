@@ -54,7 +54,7 @@ fn build_node<'a>(node: Node<'a>, factory: &NodeFactory<'a>) -> VNode<'a> {
             )
         }
         Node::Text(text) => {
-            let text: String = text.0.iter().map(|v| v.to_string()).collect();
+            let text: String = text.1.iter().map(|v| v.to_string()).collect();
             factory.text(format_args!("{}", text))
         }
     }

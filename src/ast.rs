@@ -3,8 +3,7 @@ use std::fmt::{self, Debug, Formatter};
 
 #[derive(Logos, Debug, Clone, PartialEq)]
 pub enum Value<'a> {
-    #[regex(r#"[^"\\{}]*"#, |t| t.slice(), priority = 1)]
-    #[regex(r#"(\{\{+)|(\}\}+)"#, |t| t.slice(), priority = 3)]
+    #[regex(r#"((\{\{)|(\}\})|([^{}]))*"#, |t| t.slice())]
     Constant(&'a str),
 
     #[regex(r"\{[\w_][\w\d_]*:?((#?\?)|(:?.?[.<>^]?))?\}", |t|{
@@ -28,27 +27,26 @@ impl<'a> Value<'a> {
 }
 
 #[derive(Clone, PartialEq, Debug)]
-pub struct Values<'a>(pub Vec<Value<'a>>);
+pub struct Values<'a>(pub String, pub Vec<Value<'a>>, pub String);
 
 impl Values<'_> {
     pub fn to_string(&self) -> String {
-        let mut result = String::new();
-        for val in &self.0 {
+        let mut result = self.0.clone();
+        for val in &self.1 {
             match &val {
                 Value::Constant(s) => result += s,
                 Value::Variable(s) => result += format!("{{{}}}", s).as_str(),
                 Value::Error => result += "!error!",
             }
         }
+        result += &self.2;
         result
     }
 }
 
 impl fmt::Display for Values<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.write_str("\"")?;
         f.write_str(self.to_string().as_str())?;
-        f.write_str("\"")?;
         Ok(())
     }
 }

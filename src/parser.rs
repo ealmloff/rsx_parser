@@ -16,10 +16,11 @@ fn test_parse() {
 
     assert_eq!(
         lex.next(),
-        Some(Token::Values(Values(vec![
-            Value::Variable("x"),
-            Value::Constant("px")
-        ])))
+        Some(Token::Values(Values(
+            "\"".to_string(),
+            vec![Value::Variable("x"), Value::Constant("px")],
+            "\"".to_string(),
+        )))
     );
     assert_eq!(lex.slice(), r#""{x}px""#);
 
@@ -31,9 +32,12 @@ fn test_parse() {
 
 #[derive(Logos, Debug, PartialEq, Clone)]
 pub enum Token<'a> {
-    // #[regex(r##"r?#*".*"#*"##, process_value, priority = 15)]
-    #[regex(r#""[^"\\]*""#, process_value)]
-    #[regex(r##"r#+".*"#+"##, process_value)]
+    #[regex(r#""([^"\\]|(\\.))*""#, process_value)]
+    // non-deterministic regex is not supported by logos
+    // #[regex(r#"r"[^"]*""#, process_value)]
+    // #[regex(r##"r#"(("[^#]?)|[^"])*"#"##, process_value)]
+    // #[regex(r###"r##"((".?[^#]?)|[^"])*"##"###, process_value)]
+    // #[regex(r####"r###"((".?.?[^#]?)|[^"])*"###"####, process_value)]
     Values(Values<'a>),
 
     #[regex(r"[#\w\d_]+ *:", process_attribute)]
@@ -83,11 +87,15 @@ fn process_attribute<'a>(lex: &mut Lexer<'a, Token<'a>>) -> Option<&'static str>
 
 fn process_value<'a>(lex: &mut Lexer<'a, Token<'a>>) -> Values<'a> {
     let mut text = lex.slice();
-    if let Some((_, a)) = text.split_once('"') {
+    let mut prefix = String::new();
+    let mut suffix = String::new();
+    if let Some((b, a)) = text.split_once('"') {
         text = a;
+        prefix = b.to_string() + "\"";
     }
-    if let Some((b, _)) = text.rsplit_once('"') {
+    if let Some((b, a)) = text.rsplit_once('"') {
         text = b;
+        suffix = "\"".to_string() + a;
     }
-    Values(Value::lexer(text).collect())
+    Values(prefix, Value::lexer(text).collect(), suffix)
 }

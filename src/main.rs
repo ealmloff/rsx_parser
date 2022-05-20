@@ -206,6 +206,12 @@ text_parse!(
     parse_rsx_2
 );
 
+text_parse!(
+    r####"rsx!{r###"hello "## world "#"###}"####,
+    "rsx! {\n\tr###\"hello \"## world \"#\"###\n}",
+    parse_rsx_3
+);
+
 fn main() {
     dioxus::web::launch(app);
 }
