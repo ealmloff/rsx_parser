@@ -196,7 +196,7 @@ macro_rules! text_parse {
 
 text_parse!(
     r#"rsx!{div{width: "100px",height: "*{x}px",span{color: "red","hello world"}}}"#,
-    "rsx! {\n\tdiv {\n\t\twidth: \"100px\",\n\t\theight: \"*{!x!}px\",\n\t\tspan {\n\t\t\tcolor: \"red\",\n\t\t\t\"hello world\"\n\t\t}\n\t}\n}",
+    "rsx! {\n\tdiv {\n\t\twidth: \"100px\",\n\t\theight: \"*{x}px\",\n\t\tspan {\n\t\t\tcolor: \"red\",\n\t\t\t\"hello world\"\n\t\t}\n\t}\n}",
     parse_rsx_1
 );
 

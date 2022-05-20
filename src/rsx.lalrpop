@@ -22,11 +22,11 @@ Comma<T>: Vec<T> = {
 
 NodeConstructor: Node<'input> = {
     ElementConstructor => Node::Element(<>),
-    <"val"> => Node::Text(<>),
+    <"val"> ","? => Node::Text(<>),
 }
 
 ElementConstructor: Element<'input> = {
-    <tag: "el"> <attributes: Comma<AttributeSetter>> <children:(NodeConstructor)*> "}" => {
+    <tag: "el"> <attributes: Comma<AttributeSetter>> <children:(NodeConstructor)*> "}" ","? => {
         Element {
             tag,
             attributes,

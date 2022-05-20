@@ -33,6 +33,7 @@ fn test_parse() {
 pub enum Token<'a> {
     // #[regex(r##"r?#*".*"#*"##, process_value, priority = 15)]
     #[regex(r#""[^"\\]*""#, process_value)]
+    #[regex(r##"r#+".*"#+"##, process_value)]
     Values(Values<'a>),
 
     #[regex(r"[#\w\d_]+ *:", process_attribute)]
